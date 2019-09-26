@@ -1,0 +1,53 @@
+version: '3'
+services:
+  node:
+    container_name: ${APP_NAME}-app
+    build:
+      context: ../worklog-monitor-api
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - ../worklog-monitor-api/:/home/node/app/
+      - /home/node/app/node_modules
+    env_file:
+      - .env
+    command: >
+      sh -c 'yarn start:debug'
+    ports:
+      - 9229:9229
+
+  ui:
+    image: node:12-alpine
+    working_dir: /var/www/html
+    container_name: ${APP_NAME}-ui
+    command: >
+      sh -c '
+      yarn && yarn start'
+    environment:
+      - DANGEROUSLY_DISABLE_HOST_CHECK=true
+      - SKIP_PREFLIGHT_CHECK=true
+    volumes:
+      - ../worklog-monitor-ui/package.json:/var/www/html/package.json
+      - ../worklog-monitor-ui/yarn.lock:/var/www/html/yarn.lock:delegated
+      - ../worklog-monitor-ui/tsconfig.json:/var/www/html/tsconfig.json
+      - ../worklog-monitor-ui/src:/var/www/html/src
+      - ../worklog-monitor-ui/public:/var/www/html/public
+      - ../worklog-monitor-ui/utils:/var/www/html/utils
+      - ../worklog-monitor-ui/node_modules:/var/www/html/node_modules:delegated
+
+  nginx:
+    build:
+      context: ./reverse-proxy
+      dockerfile: Dockerfile
+    container_name: ${APP_NAME}-nginx
+    env_file:
+      - .env
+    volumes:
+      - ./reverse-proxy/logs/nginx/:/var/log/nginx
+      - ./reverse-proxy/${DOMAIN}.crt:/etc/nginx/${DOMAIN}.crt
+      - ./reverse-proxy/${DOMAIN}.key:/etc/nginx/${DOMAIN}.key
+    depends_on:
+      - node
+    ports:
+      - 80:80
+      - 443:443
