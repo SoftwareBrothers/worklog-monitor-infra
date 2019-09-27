@@ -10,7 +10,7 @@ services:
       - ../worklog-monitor-api/:/home/node/app/
       - /home/node/app/node_modules
     env_file:
-      - .env
+      - ../worklog-monitor-api/.env
     command: >
       sh -c 'yarn start:debug'
     ports:
