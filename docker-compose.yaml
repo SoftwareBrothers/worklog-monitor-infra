@@ -25,11 +25,12 @@ services:
       yarn && yarn start'
     environment:
       - DANGEROUSLY_DISABLE_HOST_CHECK=true
-      - SKIP_PREFLIGHT_CHECK=true
+      - HOST=0.0.0.0
     volumes:
       - ../worklog-monitor-ui/package.json:/var/www/html/package.json
       - ../worklog-monitor-ui/yarn.lock:/var/www/html/yarn.lock:delegated
       - ../worklog-monitor-ui/tsconfig.json:/var/www/html/tsconfig.json
+      - ../worklog-monitor-ui/.env:/var/www/html/.env
       - ../worklog-monitor-ui/src:/var/www/html/src
       - ../worklog-monitor-ui/public:/var/www/html/public
       - ../worklog-monitor-ui/utils:/var/www/html/utils
@@ -49,5 +50,5 @@ services:
     depends_on:
       - node
     ports:
-      - 80:80
+      - 3000:80
       - 443:443

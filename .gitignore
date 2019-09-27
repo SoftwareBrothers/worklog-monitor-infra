@@ -1,4 +1,5 @@
 logs/*
+reverse-proxy/logs/*
 .env
 # IDEs and editors
 *.iml
